@@ -1,0 +1,132 @@
+plugins {
+  id "java-gradle-plugin"
+  id "maven-publish"
+  id 'signing'
+}
+
+group = 'com.unclezs'
+version = property("app.version")
+description = "gradle sass plugin"
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+tasks.withType(JavaCompile) {
+  options.encoding = "UTF-8"
+  options.fork = true
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+  options.compilerArgs += ['-Xdoclint:none', '-Xlint:none', '-nowarn']
+}
+
+javadoc {
+  enabled = false
+  if (JavaVersion.current().isJava9Compatible()) {
+    options.addBooleanOption('html5', true)
+  }
+  options.addStringOption("charset", "UTF-8")
+}
+
+repositories {
+  jcenter()
+  mavenCentral()
+}
+
+dependencies {
+  // lombok
+  annotationProcessor "org.projectlombok:lombok:1.18.18"
+  compileOnly "org.projectlombok:lombok:1.18.18"
+  // test
+  testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.0"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+  // jSass
+  implementation "io.bit3:jsass:5.5.6"
+}
+
+test {
+  useJUnitPlatform()
+  include(["**/*Tests.class", "**/*Test.class"])
+}
+
+gradlePlugin {
+  plugins {
+    sassPlugin {
+      id = 'com.unclezs.gradle.sass'
+      implementationClass = 'com.unclezs.gradle.sass.SassCompilePlugin'
+    }
+  }
+}
+
+publishing {
+  def snapshot = project.version.endsWith('SNAPSHOT')
+  repositories {
+    maven {
+      name = "aliyun"
+      def releasesRepoUrl = aliReleasesRepoUrl
+      def snapshotsRepoUrl = aliSnapshotsRepoUrl
+      url = snapshot ? snapshotsRepoUrl : releasesRepoUrl
+      credentials {
+        username = aliMavenUsername
+        password = aliMavenPassword
+      }
+    }
+    maven {
+      name = "local"
+      def releasesRepoUrl = "${buildDir}/repo/release"
+      def snapshotsRepoUrl = "${buildDir}/repo/snapshot"
+      url = snapshot ? snapshotsRepoUrl : releasesRepoUrl
+    }
+    maven {
+      name = "sonatype"
+      def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+      url = snapshot ? snapshotsRepoUrl : releasesRepoUrl
+      url = releasesRepoUrl
+      credentials {
+        username = findProperty("sonatype.name")
+        password = findProperty("sonatype.password")
+      }
+    }
+  }
+  publications {
+    sassPlugin(MavenPublication) {
+      from components.java
+      pom {
+        afterEvaluate {
+          name = project.description
+          description = project.description
+        }
+        url = "https://github.com/unclezs/sass-gradle-plugin"
+        licenses {
+          license {
+            name = "Apache License, Version 2.0"
+            url = "https://www.apache.org/licenses/LICENSE-2.0"
+            distribution = "repo"
+          }
+        }
+        scm {
+          url = "https://github.com/unclezs/sass-gradle-plugin"
+          connection = "scm:git:git://github.com/unclezs/sass-gradle-plugin"
+          developerConnection = "scm:git:git://github.com/unclezs/sass-gradle-plugin"
+        }
+        developers {
+          developer {
+            id = "uncle"
+            name = "uncle"
+            email = "unclezs@qq.com"
+          }
+        }
+        issueManagement {
+          system = "GitHub"
+          url = "https://github.com/unclezs/sass-gradle-plugin/issues"
+        }
+      }
+    }
+  }
+}
+
+signing {
+  sign publishing.publications.sassPlugin;
+}
