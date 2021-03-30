@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 
 /**
- * @author zhanghongguo@sensorsdata.cn
+ * @author blog.uncles.com
  * @since 2021/03/30 14:27
  */
 public class SassTest {
