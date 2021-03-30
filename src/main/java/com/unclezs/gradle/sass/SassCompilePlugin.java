@@ -3,6 +3,12 @@ package com.unclezs.gradle.sass;
 import lombok.Getter;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.tasks.Copy;
+
+import java.io.File;
+import java.util.Set;
 
 /**
  * sass 编译插件
@@ -19,6 +25,23 @@ public class SassCompilePlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
-    project.getTasks().create("compileSass", SassCompile.class, project);
+    SassExtension extension = project.getExtensions().create("sass", SassExtension.class);
+    project.getPlugins().apply(JavaPlugin.class);
+    project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets()
+      .all(sourceSet -> {
+        String taskName = sourceSet.getTaskName("compile", "Sass");
+        Set<File> srcDirs = sourceSet.getResources().getSrcDirs();
+        int i = 1;
+        for (File srcDir : srcDirs) {
+          SassCompile sassCompile = project.getTasks().create(i == 1 ? taskName : taskName + i, SassCompile.class, project);
+          i++;
+          Copy processResources = (Copy) project.getTasks().getByName(sourceSet.getProcessResourcesTaskName());
+          sassCompile.setSourceDir(srcDir);
+          sassCompile.setDestinationDir(srcDir);
+          sassCompile.setSassPath(extension.getSassPath());
+          sassCompile.setCssPath(extension.getCssPath());
+          processResources.dependsOn(sassCompile);
+        }
+      });
   }
 }

@@ -64,12 +64,12 @@ publishing {
   repositories {
     maven {
       name = "aliyun"
-      def releasesRepoUrl = aliReleasesRepoUrl
-      def snapshotsRepoUrl = aliSnapshotsRepoUrl
+      def releasesRepoUrl = findProperty("aliyun.maven.release")
+      def snapshotsRepoUrl = findProperty("aliyun.maven.snapshot")
       url = snapshot ? snapshotsRepoUrl : releasesRepoUrl
       credentials {
-        username = aliMavenUsername
-        password = aliMavenPassword
+        username = findProperty("aliyun.maven.username")
+        password = findProperty("aliyun.maven.password")
       }
     }
     maven {
@@ -83,7 +83,6 @@ publishing {
       def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
       def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
       url = snapshot ? snapshotsRepoUrl : releasesRepoUrl
-      url = releasesRepoUrl
       credentials {
         username = findProperty("sonatype.name")
         password = findProperty("sonatype.password")
@@ -91,8 +90,7 @@ publishing {
     }
   }
   publications {
-    sassPlugin(MavenPublication) {
-      from components.java
+    pluginMaven(MavenPublication) {
       pom {
         afterEvaluate {
           name = project.description
@@ -128,5 +126,5 @@ publishing {
 }
 
 signing {
-  sign publishing.publications.sassPlugin;
+  sign publishing.publications.pluginMaven;
 }

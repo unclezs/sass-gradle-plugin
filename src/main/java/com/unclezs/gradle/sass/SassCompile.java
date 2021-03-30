@@ -6,17 +6,15 @@ import io.bit3.jsass.Options;
 import io.bit3.jsass.Output;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.NonNullApi;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.plugins.BasePlugin;
-import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFiles;
 import org.gradle.api.tasks.TaskAction;
@@ -28,12 +26,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Set;
 
 /**
  * @author blog.unclezs.com
  * @since 2021/3/30 2:45 下午
  */
+@Setter
+@Getter
 @NonNullApi
 public class SassCompile extends DefaultTask {
   public static final String CHARSET = "@charset \"UTF-8\";";
@@ -41,27 +40,35 @@ public class SassCompile extends DefaultTask {
   public static final String SCSS = ".scss";
   public static final String SASS = ".sass";
   public static final String CSS = ".css";
+  @Internal
   private final Project project;
-  private File sourceDir;
-  private File destinationDir;
+  @Internal
   private final Compiler compiler = new Compiler();
+  @Internal
   private final Options options = new Options();
+  @Internal
+  private File sourceDir;
+  @Internal
+  private File destinationDir;
   /**
    * 输出的css目录
    */
   @Input
   @Optional
-  @Getter
-  @Setter
-  private String cssPath = "css";
+  private String cssPath;
   /**
    * sass目录
    */
   @Input
   @Optional
-  @Getter
-  @Setter
-  private String sassPath = "scss";
+  private String sassPath;
+
+  @Inject
+  public SassCompile(Project project) {
+    setGroup(BasePlugin.BUILD_GROUP);
+    setDescription("compile sass");
+    this.project = project;
+  }
 
   @InputFiles
   protected FileTree getSourceFiles() {
@@ -78,37 +85,17 @@ public class SassCompile extends DefaultTask {
     return files;
   }
 
-  @Inject
-  public SassCompile(Project project) {
-    setGroup(BasePlugin.BUILD_GROUP);
-    setDescription("compile sass");
-    this.project = project;
-  }
-
-  /**
-   * 遍历Java插件下的默认约束的资源目录
-   */
-  @TaskAction
-  public void compile() {
-    project.getPlugins().apply(JavaPlugin.class);
-    project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().forEach(sourceSet -> {
-      Set<File> files = sourceSet.getResources().getSrcDirs();
-      for (File sourceDir : files) {
-        this.sourceDir = sourceDir;
-        this.destinationDir = sourceSet.getOutput().getResourcesDir();
-        compileSass();
-      }
-    });
-  }
-
   /**
    * 编译一个文件夹下的sass为css
    */
+  @TaskAction
   private void compileSass() {
+    SassExtension extension = project.getExtensions().getByType(SassExtension.class);
+    setSassPath(extension.getSassPath());
+    setCssPath(extension.getCssPath());
     File sassDir = new File(sourceDir, sassPath);
     File cssDir = new File(sourceDir, cssPath);
-    File cssBuildDir = new File(destinationDir, cssPath);
-    boolean empty = project.fileTree(sassDir).visit(file -> {
+    project.fileTree(sassDir).visit(file -> {
       String name = file.getName();
       if (name.startsWith(UNDER_LINE)) {
         return;
@@ -133,14 +120,6 @@ public class SassCompile extends DefaultTask {
           throw new TaskExecutionException(SassCompile.this, e);
         }
       }
-    }).isEmpty();
-    if (!empty) {
-      try {
-        FileUtils.copyDirectory(cssDir, cssBuildDir);
-        FileUtils.deleteDirectory(new File(destinationDir,sassPath));
-      } catch (IOException e) {
-        throw new RuntimeException("copy to build error", e);
-      }
-    }
+    });
   }
 }
