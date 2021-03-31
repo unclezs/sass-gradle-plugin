@@ -21,14 +21,6 @@ tasks.withType(JavaCompile) {
   options.compilerArgs += ['-Xdoclint:none', '-Xlint:none', '-nowarn']
 }
 
-javadoc {
-  enabled = false
-  if (JavaVersion.current().isJava9Compatible()) {
-    options.addBooleanOption('html5', true)
-  }
-  options.addStringOption("charset", "UTF-8")
-}
-
 repositories {
   jcenter()
   mavenCentral()
@@ -52,15 +44,18 @@ test {
 
 gradlePlugin {
   plugins {
-    sassPlugin {
+    sass {
       id = 'com.unclezs.gradle.sass'
       implementationClass = 'com.unclezs.gradle.sass.SassCompilePlugin'
     }
   }
 }
 
+
+def githubUrl = "https://github.com/unclezs/${project.name}"
+def snapshot = project.version.endsWith('SNAPSHOT')
+
 publishing {
-  def snapshot = project.version.endsWith('SNAPSHOT')
   repositories {
     maven {
       name = "aliyun"
@@ -89,42 +84,48 @@ publishing {
       }
     }
   }
-  publications {
-    pluginMaven(MavenPublication) {
-      pom {
-        afterEvaluate {
-          name = project.description
-          description = project.description
-        }
-        url = "https://github.com/unclezs/sass-gradle-plugin"
-        licenses {
-          license {
-            name = "Apache License, Version 2.0"
-            url = "https://www.apache.org/licenses/LICENSE-2.0"
-            distribution = "repo"
-          }
-        }
-        scm {
-          url = "https://github.com/unclezs/sass-gradle-plugin"
-          connection = "scm:git:git://github.com/unclezs/sass-gradle-plugin"
-          developerConnection = "scm:git:git://github.com/unclezs/sass-gradle-plugin"
-        }
-        developers {
-          developer {
-            id = "uncle"
-            name = "uncle"
-            email = "unclezs@qq.com"
-          }
-        }
-        issueManagement {
-          system = "GitHub"
-          url = "https://github.com/unclezs/sass-gradle-plugin/issues"
-        }
+}
+
+publishing.publications.withType(MavenPublication) {
+  pom {
+    url = githubUrl
+    name = project.description
+    description = project.description
+    licenses {
+      license {
+        name = "Apache License, Version 2.0"
+        url = "https://www.apache.org/licenses/LICENSE-2.0"
+        distribution = "repo"
       }
+    }
+    scm {
+      url = githubUrl
+      connection = "scm:git:${githubUrl}"
+      developerConnection = "scm:git:${githubUrl}"
+    }
+    developers {
+      developer {
+        id = "uncle"
+        name = "uncle"
+        email = "unclezs@qq.com"
+      }
+    }
+    issueManagement {
+      system = "GitHub"
+      url = "${githubUrl}/issues"
     }
   }
 }
 
+javadoc {
+  options.addStringOption("charset", "UTF-8")
+  options.addStringOption("tag", "date")
+}
+
 signing {
-  sign publishing.publications.pluginMaven;
+  sign publishing.publications
+}
+
+tasks.withType(Sign) {
+  onlyIf { !snapshot }
 }
