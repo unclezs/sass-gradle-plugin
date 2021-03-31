@@ -1,5 +1,5 @@
 # sass-gradle-plugin
-![gradle build](https://img.shields.io/github/workflow/status/unclezs/sass-gradle-plugin/gradle) [![GitHub license](https://img.shields.io/github/license/unclezs/sass-gradle-plugin?color=%2340C0D0&label=License)](https://github.com/unclezs/sass-gradle-plugin/blob/master/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/unclezs/sass-gradle-plugin?color=orange&label=Issues)](https://github.com/unclezs/sass-gradle-plugin/issues)
+![gradle build](https://img.shields.io/github/workflow/status/unclezs/sass-gradle-plugin/Java%20CI%20with%20Gradle) [![GitHub license](https://img.shields.io/github/license/unclezs/sass-gradle-plugin?color=%2340C0D0&label=License)](https://github.com/unclezs/sass-gradle-plugin/blob/master/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/unclezs/sass-gradle-plugin?color=orange&label=Issues)](https://github.com/unclezs/sass-gradle-plugin/issues)
 
 基于 [jsass](https://github.com/bit3/jsass) 的sass编译插件
 
