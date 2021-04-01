@@ -118,7 +118,7 @@ publishing.publications.withType(MavenPublication) {
 }
 
 javadoc {
-  options.addStringOption("charset", "UTF-8")
+  options.encoding = 'UTF-8'
   options.addStringOption("tag", "date")
 }
 
