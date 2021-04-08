@@ -8,7 +8,7 @@
 ```gradle
 buildscript {
   dependencies {
-    classpath 'com.unclezs:sass-gradle-plugin:1.0.5'
+    classpath 'com.unclezs:sass-gradle-plugin:1.0.7'
   }
 }
 apply plugin: "com.unclezs.gradle.sass"
