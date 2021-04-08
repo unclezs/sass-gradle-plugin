@@ -17,7 +17,9 @@ public class SassTest {
   public void test() {
     Project project = ProjectBuilder.builder().withProjectDir(new File(".")).build();
     project.apply(c -> c.plugin("com.unclezs.gradle.sass"));
-    project.getExtensions().getByType(SassExtension.class).setSassPath("uncle");
+    SassExtension extension = project.getExtensions().getByType(SassExtension.class);
+    extension.setCssPath("com/unclezs");
+    extension.setSassPath("uncleA");
     Task compileSass = project.getTasks().getByName("compileTestSass");
     compileSass.getActions().forEach(action -> action.execute(compileSass));
   }

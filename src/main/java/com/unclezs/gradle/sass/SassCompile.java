@@ -11,6 +11,7 @@ import org.gradle.api.NonNullApi;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.file.FileTree;
+import org.gradle.api.internal.file.UnionFileTree;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
@@ -80,7 +81,11 @@ public class SassCompile extends DefaultTask {
 
   @OutputFiles
   protected FileTree getOutputFiles() {
-    ConfigurableFileTree files = getProject().fileTree(new File(destinationDir, cssPath));
+    File out = new File(destinationDir, cssPath);
+    if (!out.exists()) {
+      return new UnionFileTree();
+    }
+    ConfigurableFileTree files = getProject().fileTree(out);
     files.include("**/*.css");
     return files;
   }
@@ -95,7 +100,9 @@ public class SassCompile extends DefaultTask {
     setCssPath(extension.getCssPath());
     File sassDir = new File(sourceDir, sassPath);
     File cssDir = new File(sourceDir, cssPath);
+    System.out.println(cssDir);
     project.fileTree(sassDir).visit(file -> {
+      System.out.println("123");
       String name = file.getName();
       if (name.startsWith(UNDER_LINE)) {
         return;
