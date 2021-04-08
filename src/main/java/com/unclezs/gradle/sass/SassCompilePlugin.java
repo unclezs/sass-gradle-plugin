@@ -27,7 +27,7 @@ public class SassCompilePlugin implements Plugin<Project> {
   public void apply(Project project) {
     SassExtension extension = project.getExtensions().create("sass", SassExtension.class);
     project.getPlugins().apply(JavaPlugin.class);
-    project.afterEvaluate(c -> project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets()
+    project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets()
       .all(sourceSet -> {
         String taskName = sourceSet.getTaskName("compile", "Sass");
         Set<File> srcDirs = sourceSet.getResources().getSrcDirs();
@@ -42,6 +42,6 @@ public class SassCompilePlugin implements Plugin<Project> {
           sassCompile.setCssPath(extension.getCssPath());
           processResources.dependsOn(sassCompile);
         }
-      }));
+      });
   }
 }

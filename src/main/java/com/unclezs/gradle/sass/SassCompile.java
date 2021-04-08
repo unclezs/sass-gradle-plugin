@@ -100,9 +100,7 @@ public class SassCompile extends DefaultTask {
     setCssPath(extension.getCssPath());
     File sassDir = new File(sourceDir, sassPath);
     File cssDir = new File(sourceDir, cssPath);
-    System.out.println(cssDir);
     project.fileTree(sassDir).visit(file -> {
-      System.out.println("123");
       String name = file.getName();
       if (name.startsWith(UNDER_LINE)) {
         return;

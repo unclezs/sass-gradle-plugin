@@ -6,6 +6,7 @@ import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author blog.uncles.com
@@ -14,12 +15,12 @@ import java.io.File;
 public class SassTest {
 
   @Test
-  public void test() {
+  public void test() throws InterruptedException {
     Project project = ProjectBuilder.builder().withProjectDir(new File(".")).build();
     project.apply(c -> c.plugin("com.unclezs.gradle.sass"));
     SassExtension extension = project.getExtensions().getByType(SassExtension.class);
-    extension.setCssPath("com/unclezs");
-    extension.setSassPath("uncleA");
+    extension.setCssPath("com/unclezs/css");
+    extension.setSassPath("uncle");
     Task compileSass = project.getTasks().getByName("compileTestSass");
     compileSass.getActions().forEach(action -> action.execute(compileSass));
   }
