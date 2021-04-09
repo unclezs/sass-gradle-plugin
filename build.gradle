@@ -1,4 +1,6 @@
 plugins {
+  id "com.gradle.plugin-publish" version "0.14.0"
+  id "io.codearte.nexus-staging" version "0.30.0"
   id "java-gradle-plugin"
   id "maven-publish"
   id 'signing'
@@ -47,6 +49,19 @@ gradlePlugin {
     sass {
       id = 'com.unclezs.gradle.sass'
       implementationClass = 'com.unclezs.gradle.sass.SassCompilePlugin'
+    }
+  }
+}
+
+pluginBundle {
+  website = 'https://blog.unclezs.com'
+  vcsUrl = 'https://github.com/unclezs/sass-gradle-plugin'
+  description = 'Gradle Sass Compile Plugin For Java'
+  tags = ['sass', 'scss', 'java']
+
+  plugins {
+    sass {
+      displayName = 'Gradle Sass Compile Plugin For Java'
     }
   }
 }
@@ -115,6 +130,11 @@ publishing.publications.withType(MavenPublication) {
       url = "${githubUrl}/issues"
     }
   }
+}
+
+nexusStaging {
+  username = findProperty("sonatype.name")
+  password = findProperty("sonatype.password")
 }
 
 javadoc {
