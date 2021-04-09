@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'com.unclezs'
-version = property("app.version")
+version = property("version")
 description = "gradle sass plugin"
 
 java {
