@@ -14,7 +14,7 @@ https://plugins.gradle.org/plugin/com.unclezs.gradle.sass
 
 ```groovy
 plugins {
-  id "com.unclezs.gradle.sass" version "1.0.8"
+  id "com.unclezs.gradle.sass" version "1.0.10"
 }
 ```
 
@@ -28,7 +28,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "com.unclezs:sass-gradle-plugin:1.0.8"
+    classpath "com.unclezs:sass-gradle-plugin:1.0.10"
   }
 }
 

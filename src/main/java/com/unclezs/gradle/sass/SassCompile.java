@@ -19,7 +19,6 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFiles;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskExecutionException;
-import org.gradle.internal.impldep.com.google.gson.Gson;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -111,9 +110,6 @@ public class SassCompile extends DefaultTask {
             Files.write(cssFile.toPath(), output.getCss().replace(CHARSET, "").trim().getBytes(StandardCharsets.UTF_8));
           }
         } catch (CompilationException e) {
-          SassError sassError = new Gson().fromJson(e.getErrorJson(), SassError.class);
-          getLogger().error("{}:{}:{}", sassError.getFile(), sassError.getLine(), sassError.getColumn());
-          getLogger().error(e.getErrorMessage());
           throw new TaskExecutionException(SassCompile.this, e);
         } catch (IOException e) {
           getLogger().error(e.getLocalizedMessage());
